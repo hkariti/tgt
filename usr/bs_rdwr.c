@@ -89,6 +89,11 @@ static void bs_rdwr_request(struct scsi_cmd *cmd)
 			break;
 		}
 
+        struct iscsi_session *session = get_session_by_tshid(cmd->cmd_itn_id);
+        char* initiator_id = NULL;
+        if (session) {
+            initiator_id = session->initiator;
+        }
 		ret = pread64(fd, tmpbuf, length, offset);
 
 		if (ret != length) {
