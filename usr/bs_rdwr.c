@@ -215,43 +215,6 @@ write:
 		if (do_verify)
 			goto verify;
 		break;
-	case WRITE_SAME:
-	case WRITE_SAME_16:
-		/* WRITE_SAME used to punch hole in file */
-		if (cmd->scb[1] & 0x08) {
-			ret = unmap_file_region(fd, offset, tl);
-			if (ret != 0) {
-				eprintf("Failed to punch hole for WRITE_SAME"
-					" command\n");
-				result = SAM_STAT_CHECK_CONDITION;
-				key = HARDWARE_ERROR;
-				asc = ASC_INTERNAL_TGT_FAILURE;
-				break;
-			}
-			break;
-		}
-		while (tl > 0) {
-			blocksize = 1 << cmd->dev->blk_shift;
-			tmpbuf = scsi_get_out_buffer(cmd);
-
-			switch(cmd->scb[1] & 0x06) {
-			case 0x02: /* PBDATA==0 LBDATA==1 */
-				put_unaligned_be32(offset, tmpbuf);
-				break;
-			case 0x04: /* PBDATA==1 LBDATA==0 */
-				/* physical sector format */
-				put_unaligned_be64(offset, tmpbuf);
-				break;
-			}
-
-			ret = pwrite64(fd, tmpbuf, blocksize, offset);
-			if (ret != blocksize)
-				set_medium_error(&result, &key, &asc);
-
-			offset += blocksize;
-			tl     -= blocksize;
-		}
-		break;
 	case READ_6:
 	case READ_10:
 	case READ_12:
@@ -483,8 +446,6 @@ __attribute__((constructor)) static void bs_rdwr_constructor(void)
 		WRITE_12,
 		WRITE_16,
 		WRITE_6,
-		WRITE_SAME,
-		WRITE_SAME_16,
 		WRITE_VERIFY,
 		WRITE_VERIFY_12,
 		WRITE_VERIFY_16
