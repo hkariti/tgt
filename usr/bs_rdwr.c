@@ -66,7 +66,6 @@ static void bs_rdwr_request(struct scsi_cmd *cmd)
 	uint8_t key;
 	uint16_t asc;
 	char *tmpbuf;
-	size_t blocksize;
 	uint64_t offset = cmd->offset;
 	uint32_t tl     = cmd->tl;
 	int do_verify = 0;
