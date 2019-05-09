@@ -16,7 +16,7 @@ export GLFS_BD
 export SD_NOTIFY
 
 .PHONY: all
-all: programs doc conf scripts
+all: programs conf scripts
 
 # Targets for the /usr/sbin utilities
 .PHONY: programs install-programs clean-programs
@@ -64,7 +64,7 @@ clean-conf:
 	$(MAKE) -C conf clean
 
 .PHONY: install
-install: install-programs install-doc install-conf install-scripts
+install: install-programs install-conf install-scripts
 
 .PHONY: rpm
 rpm:
